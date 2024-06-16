@@ -4,7 +4,7 @@
 This app is build for swimmers of the Blue Marlins. In this app the swimmers can add their swimming performances.This app helps the swimmers know what they did previously to make them better and improve their swimming performance.
 
 # App
-If you want to use this app ypu can visit http://prg08-opdracht1-btmnnid8b-sayyid15s-projects.vercel.app and if you want it locally you have to follow the next steps.
+If you want to use this app ypu can visit https://prg08-opdracht1-eq1q012gs-sayyid15s-projects.vercel.app/ and if you want it locally you have to follow the next steps.
 
 # Installation
 - Open your terminal in the code editor of your choice and clone the repo by using:
