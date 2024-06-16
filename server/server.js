@@ -84,10 +84,11 @@ async function swimmerSummary(swimmerTraining) {
         context += `${swimmer}`
     }
 
-    let prompt = `Make a summary of the swimmer entry in I person${swimmerTraining}.
-    Start of by stating :"${date}:".Make a comment about the weather using the following location: "${currentWeather}".
+    let prompt = `Make a summary of the swimmer performance in I person${swimmerTraining}.
+    Start of by stating thw :"${date}:".
     The location is: "${poolName}".
-    If the entry contains the reference to a previous day use this context: "${context}"`
+    Make a comment about the weather using the following location: "${currentWeather}".
+    If the performance contains the reference to a previous performance use this context: "${context}"`
 
 
     const response = await model.invoke(prompt, {
