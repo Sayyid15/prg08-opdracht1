@@ -18,6 +18,11 @@
     {
       "src": "/(.*)",
       "dest": "/client/index.html"
+
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/style.css"
     }
   ]
 
