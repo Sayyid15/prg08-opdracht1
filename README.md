@@ -1,12 +1,12 @@
 # Welcome To The Blue Marlins Performance App
 
 # Overview
-This app is build for swimmers of the Blue Marlins. In this app the swimmers can add their daily training and performances.This app helps the swimmers know what they did previously to make them better and improve their swimming performance.
+This app is build for swimmers of the Blue Marlins. In this app the swimmers can add their swimming performances.This app helps the swimmers know what they did previously to make them better and improve their swimming performance.
 
 # Use
 If you want to use this app ypu can visit prg08-opdracht1-btmnnid8b-sayyid15s-projects.vercel.app and if you want it locally you have to follow the next steps.
 
-# Install
+# Installation
 - Open your terminal in the code editor of your choice and clone the repo by using:
   git clone
 
@@ -28,4 +28,17 @@ You have to add the variables in your .env file using this structure:
 - INSTANCE_NAME= ...
 - OPENWEATHER_API_KEY= ...
 
+
+# Usage
+
+Start the app in your server directory by using:
+npm start
+
+Open your browser and navigate to http://localhost:3000/
+This text will be displayed their:
+
+To open the app:
+Navigate to your index.html in your files and open it by double clicking the index.html. Once you've opened it you can make use of the app
+
+Have Fun writing your swimming performances
 
