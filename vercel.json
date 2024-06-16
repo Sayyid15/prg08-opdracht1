@@ -1,36 +1,10 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "server/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "client/**/*",
-      "use": "@vercel/static"
-    }
+    { "src": "SERVER/server.js", "use": "@vercel/node" }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "server/server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/server/index.html"
-    }
-
-  ],
-
-  "env": {
-    "OPENAI_API_TYPE" : "azure",
-    "OPENAI_API_VERSION" : "2023-12-01-preview",
-    "OPENAI_API_BASE" : "https://cmgt-ai.openai.azure.com/",
-    "AZURE_OPENAI_API_KEY" : "07987396f9e64e9e8bd717e14068702b",
-    "DEPLOYMENT_NAME" : "deploy-text-embedding-ada",
-    "ENGINE_NAME" :"deploy-gpt-35-turbo",
-    "INSTANCE_NAME" : "cmgt-ai",
-    "OPENWEATHER_API_KEY": "8311bb0fdb944fccb7f0e7d5a9df5a23"
-  }
-
+    { "src": "/api/(.*)", "dest": "SERVER/server.js" },
+    { "src": "/(.*)", "dest": "/CLIENT/index.html" }
+  ]
 }
