@@ -21,7 +21,7 @@
     },
     {
       "src": "/static/(.*)",
-      "dest": "/client/static/$1"
+      "dest": "/client/style.css"
     }
   ]
 }
