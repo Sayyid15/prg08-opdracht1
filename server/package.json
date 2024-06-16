@@ -1,0 +1,18 @@
+{
+  "name": "your-project-name",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@langchain/openai": "^0.0.28",
+    "body-parse": "^0.1.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "langchain": "^0.1.37",
+    "openweather-api-node": "^3.1.3"
+  }
+}
