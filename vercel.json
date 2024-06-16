@@ -30,7 +30,7 @@
     "DEPLOYMENT_NAME" : "deploy-text-embedding-ada",
     "ENGINE_NAME" :"deploy-gpt-35-turbo",
     "INSTANCE_NAME" : "cmgt-ai",
-    "OPENWEATHER_API_KEY": "8311bb0fdb944fccb7f0e7d5a9df5a23",
+    "OPENWEATHER_API_KEY": "8311bb0fdb944fccb7f0e7d5a9df5a23"
   }
 
 }
