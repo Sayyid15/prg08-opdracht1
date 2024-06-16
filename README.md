@@ -8,7 +8,7 @@ If you want to use this app ypu can visit http://prg08-opdracht1-btmnnid8b-sayyi
 
 # Installation
 - Open your terminal in the code editor of your choice and clone the repo by using:
-  git clone
+  git clone https://github.com/Sayyid15/prg08-opdracht1.git
 
 - Navigate to the server directory using the command:
 cd server
