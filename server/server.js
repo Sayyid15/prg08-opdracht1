@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
-import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
+import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 
 const app = express();
 const port = 3000;
