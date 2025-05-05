@@ -4,17 +4,24 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node --env-file=.env --watch server.js",
+    "embed": "node --env-file=.env --watch embedding.js"
   },
   "dependencies": {
-    "@langchain/core": "^0.3.51",
-    "@langchain/openai": "^0.0.28",
+    "@azure/identity": "^4.8.0",
+    "@azure/openai": "^2.0.0",
+    "@langchain/community": "^0.3.40",
+    "@langchain/core": "^0.3.44",
+    "@langchain/openai": "^0.5.5",
+    "@langchain/textsplitters": "^0.1.0",
     "body-parse": "^0.1.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.19.2",
-    "langchain": "^0.1.37",
+    "faiss-node": "^0.5.1",
+    "langchain": "0.2.19",
+    "node-fetch": "^3.3.2",
     "openweather-api-node": "^3.1.3"
   }
 }

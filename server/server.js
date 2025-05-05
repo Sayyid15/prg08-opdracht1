@@ -1,124 +1,128 @@
-import {ChatOpenAI} from "@langchain/openai";
-import {OpenWeatherAPI} from "openweather-api-node";
+import { AzureChatOpenAI, AzureOpenAIEmbeddings } from "@langchain/openai";
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
+import fetch from "node-fetch";
+import { FaissStore } from "@langchain/community/vectorstores/faiss";
+import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
 
-// Initializing express app
 const app = express();
-const port = 3000
+const port = 3000;
 
-// Middleware for parsing JSON and urlencoded form data
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
-
-// Middleware to enable CORS
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// Initializing ChatOpenAI model
-const model = new ChatOpenAI({
+// Models
+const model = new AzureChatOpenAI({
     azureOpenAIApiKey: process.env.AZURE_OPENAI_API_KEY,
     azureOpenAIApiVersion: process.env.OPENAI_API_VERSION,
     azureOpenAIApiInstanceName: process.env.INSTANCE_NAME,
     azureOpenAIApiDeploymentName: process.env.ENGINE_NAME,
-})
+});
 
-// Array to store swimmer trainings
-let swimmerTrainings = []
+const embedding = new AzureOpenAIEmbeddings({
+    temperature:0,
+    azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_API_EMBEDDINGS_DEPLOYMENT_NAME
+});
 
-// Variables to store pool name and current weather
+// Load the vectorstore
+let vectorStore;
+async function loadVectorStore() {
+    vectorStore = await FaissStore.load("swimmerStoryDb", embedding);
+    console.log("Vector store loaded!");
+}
+await loadVectorStore();
+
+// State variables
+let swimmerTrainings = [];
 let poolName = '';
 let currentWeather = '';
 
-// Getting current date
+// Date formatting
 const today = new Date();
 const year = today.getFullYear();
 let month = today.getMonth() + 1;
 let day = today.getDate();
-
-// Formatting day and month
 if (day < 10) day = '0' + day;
 if (month < 10) month = '0' + month;
+const date = `${day}/${month}/${year}`;
 
-// Constructing date string
-const date = day + '/' + month + '/' + year;
-
-// Middleware to parse JSON
-app.use(express.json());
-
-// Route to welcome users
-app.get("/", (req, res) => {
-    res.send("Welcome to OpenWeatherAPI server");
-})
-
-// Route to set location and get weather
-app.post("/location", (req, res) => {
-    if (!req.body.pool) {
-        return res.status(400).json({error: 'Pool name is required'});
+// Weather fetcher
+async function getWeather(poolName) {
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+    const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${poolName}&appid=${apiKey}&units=metric`);
+    const data = await response.json();
+    if (data.weather && data.weather.length > 0) {
+        return `Current weather in ${poolName}: ${data.weather[0].description}, temperature ${data.main.temp}°C`;
+    } else {
+        return "Weather information not available.";
     }
+}
+
+// Routes
+app.get("/", (req, res) => {
+    res.send("Welcome to the Swimmer Training API!");
+});
+
+// Set location and weather
+app.post("/location", async (req, res) => {
+    const { pool } = req.body;
+    if (!pool) return res.status(400).json({ error: 'Pool name is required' });
 
     try {
-        poolName = req.body.pool;
-
-        let weather = new OpenWeatherAPI({
-            key: process.env.OPENWEATHER_API_KEY, locationName: poolName, units: "imperial"
-        })
-
-        weather.getCurrent().then(data => {
-            currentWeather = `Current weather in ${poolName} is: ${data.weather.description}`
-            console.log(currentWeather);
-        })
-
+        poolName = pool;
+        currentWeather = await getWeather(poolName);
+        console.log(currentWeather);
+        res.status(200).json({ message: "Location and weather set", weather: currentWeather });
     } catch (error) {
-        console.log("Error getting location", error);
+        console.error("Error setting location:", error);
+        res.status(500).json({ error: "Error setting location" });
     }
 });
 
-// Function to generate swimmer summary
+// Generate swimmer summary
 async function swimmerSummary(swimmerTraining) {
-    if (!swimmerTraining) {
-        throw new Error('Swimmer entry is required');
-    }
-    let context = ''
-    for (let swimmer of swimmerTrainings) {
-        context += `${swimmer}`
-    }
+    if (!swimmerTraining) throw new Error('Swimmer entry is required');
 
-    let prompt = `Make a summary of the swimmer performance in I person:${swimmerTraining}.
-    Start of by stating the :"${date}:".
-    The location is: "${poolName}".
-    Make a comment about the weather using the following location: "${currentWeather}".
-    If the performance contains the reference to a previous performance use this context: "${context}"`
+    const relevantDocs = await vectorStore.similaritySearch(swimmerTraining, 3);
+    const context = relevantDocs.map(doc => doc.pageContent).join("\n\n");
 
+    const messages = [
+        new SystemMessage(
+            `You are a swimming trainer assistant. Summarize swimmer performances warmly and professionally.\n
+Today's date: ${date}.\n
+Location: ${poolName}.\n
+Use this past context if relevant:\n${context}`
+        ),
+        new HumanMessage(`Summarize the following swimmer performance:\n${swimmerTraining}`)
+    ];
 
-    const response = await model.invoke(prompt, {
-        max_swimmer: 5
-    });
+    const response = await model.invoke(messages);
     return response.content;
 }
 
-// Route to chat with OpenAI
+// Chat endpoint
 app.post("/chat", async (req, res) => {
     try {
-        const swimmerTraining = req.body.query;
+        const { query: swimmerTraining } = req.body;
         if (!swimmerTraining) {
-            return res.status(400).json({error: 'Swimmer entry is required'});
+            return res.status(400).json({ error: 'Swimmer entry is required' });
         }
+
         const response = await swimmerSummary(swimmerTraining);
 
-        swimmerTrainings.push(response)
+        swimmerTrainings.push(swimmerTraining);
+        if (swimmerTrainings.length > 10) swimmerTrainings.shift(); // Keep last 10
 
-        if (swimmerTrainings.length > 10) {
-            swimmerTrainings.shift()
-        }
-        res.json({response, senderRole: 'OpenAI API'});
+        res.json({ response });
     } catch (error) {
-        console.error("Error fetching response", error);
-        res.status(500).json({error: "Error fetching response"});
+        console.error("Error in chat:", error);
+        res.status(500).json({ error: "Error generating swimmer summary" });
     }
 });
 
-// Starting the server
+// Start server
 app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
-})
+    console.log(`Server is running on http://localhost:${port}`);
+});
