@@ -84,8 +84,8 @@ async function swimmerSummary(swimmerTraining) {
         context += `${swimmer}`
     }
 
-    let prompt = `Make a summary of the swimmer performance in I person${swimmerTraining}.
-    Start of by stating thw :"${date}:".
+    let prompt = `Make a summary of the swimmer performance in I person:${swimmerTraining}.
+    Start of by stating the :"${date}:".
     The location is: "${poolName}".
     Make a comment about the weather using the following location: "${currentWeather}".
     If the performance contains the reference to a previous performance use this context: "${context}"`
