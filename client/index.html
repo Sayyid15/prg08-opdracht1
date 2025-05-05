@@ -6,60 +6,96 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="style.css">
-    <title>Blue Marlins</title>
-
+    <title>Blue Marlins - Swim Coach AI</title>
 </head>
 
 <body>
 <header>
-
+    <h1>Swim Coach AI</h1>
 </header>
 <main class="entire-screen">
-<section class="container">
-    <section class="card">
-    <h2 >Swimmer</h2>
-    <form class="swimming-pool-form">
-        <div class="swimming-pool-container">
-            <label>
-                <textarea name="swimming-pool" class="swimming-pool-input" placeholder="Enter swimming pool location"></textarea>
-            </label>
-            <button class="swimming-pool-button" type="submit">confirm</button>
-            <button class="loading-spinner"  style="display: none">loading</button>
-        </div>
-    </form>
+    <section class="container">
+        <!-- Document Upload Section -->
+        <section class="card">
+            <h2>Training Documents</h2>
+            <form class="document-upload-form">
+                <div class="upload-container">
+                    <label for="document-upload" class="upload-label">
+                        <span>Upload training materials (PDF)</span>
+                        <input type="file" id="document-upload" accept=".pdf" style="display: none;">
+                    </label>
+                    <button type="submit" class="upload-button">Process</button>
+                    <div class="upload-loading" style="display: none;">Processing...</div>
+                </div>
+                <div class="document-list"></div>
+            </form>
+        </section>
 
-    <form class="swimmer-form">
+        <!-- Pool Location Section -->
+        <section class="card">
+            <h2>Swim Location</h2>
+            <form class="swimming-pool-form">
+                <div class="swimming-pool-container">
+                    <label>
+                        <textarea name="swimming-pool" class="swimming-pool-input"
+                                  placeholder="Enter swimming pool location"></textarea>
+                    </label>
+                    <button class="swimming-pool-button" type="submit">Confirm Location</button>
+                    <div class="loading-spinner" style="display: none">Loading...</div>
+                </div>
+            </form>
+        </section>
 
-        <div class="input-container">
-            <label>
-                <textarea name="query" class="swimmer-input" placeholder="Write a swimming diary"></textarea>
-            </label>
-            <button class="submit-button" type="submit"> add</button>
-        </div>
-    </form>
-</section>
+        <!-- Chat Input Section -->
+        <section class="card">
+            <h2>Training Diary</h2>
+            <form class="swimmer-form">
+                <div class="input-container">
+                    <label>
+                        <textarea name="query" class="swimmer-input"
+                                  placeholder="Write about your training session or ask a question"></textarea>
+                    </label>
+                    <button class="submit-button" type="submit">Send</button>
+                    <div class="chat-loading" style="display: none">Analyzing...</div>
+                </div>
+                <div class="example-questions">
+                    <p>Try asking:</p>
+                    <ul>
+                        <li>"How can I improve my freestyle technique?"</li>
+                        <li>"Suggest a training plan for endurance"</li>
+                        <li>"Analyze today's performance"</li>
+                    </ul>
+                </div>
+            </form>
+        </section>
 
-    <section class="card">
-        <h2>Last 10 performances</h2>
-        <article class="swimmer-content">
-            <ul class="swimmer-history">
-            </ul>
-        </article>
-        <div class="buttons">
-            <button class="delete-button">delete</button>
-            <button class="delete-list-button">delete list</button>
-        </div>
+        <!-- Performance History -->
+        <section class="card">
+            <h2>Last 10 Performances</h2>
+            <article class="swimmer-content">
+                <ul class="swimmer-history"></ul>
+            </article>
+            <div class="buttons">
+                <button class="delete-button">Delete Last</button>
+                <button class="delete-list-button">Clear All</button>
+            </div>
+        </section>
+
+        <!-- Chat History -->
+        <section class="card chat-history">
+            <h2>Training Chat</h2>
+            <div class="chat-container">
+                <textarea id="swimmer-chat" class="swimmer-chat" readonly></textarea>
+            </div>
+            <button class="delete-swimmer-chat">Clear Chat</button>
+        </section>
+
+        <!-- Sources Section -->
+        <section class="card sources-card">
+            <h2>Reference Materials</h2>
+            <div class="sources-container"></div>
+        </section>
     </section>
-
-    <section class="card">
-        <h2>Swimmer Chat History</h2>
-        <label>
-            <textarea id="swimmer-chat" class="swimmer-chat" placeholder="Swimmer chat"></textarea>
-        </label>
-        <button class="delete-swimmer-chat">delete</button>
-    </section>
-
-</section>
 </main>
 <script src="script.js"></script>
 </body>

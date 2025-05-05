@@ -4,172 +4,265 @@
     box-sizing: border-box;
 }
 
+body {
+    font-family: "Georgia", serif;
+    min-height: 100vh;
+    background-color: #f0f8ff;
+}
+
 .entire-screen {
     display: flex;
     flex-direction: column;
-    height: 100%;
-
+    min-height: 100vh;
 }
 
 header {
     background-color: royalblue;
-    font-family: "serif";
+    color: white;
     text-align: center;
-    font-size: 100px;
-    width: 100vw;
+    font-size: 2.5rem;
+    width: 100%;
     height: 30vh;
+    min-height: 200px;
     position: relative;
     background-image: url("img/blueMarlins.png");
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 h2 {
-    font-family: "serif";
+    font-family: "Georgia", serif;
     text-align: center;
+    margin-bottom: 20px;
+    color: white;
+    font-size: 1.5rem;
 }
 
 .container {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
     flex-grow: 1;
-    justify-content: space-evenly;
-    align-items: stretch;
-    padding: 10px;
-    box-sizing: border-box;
 }
 
 .card {
     display: flex;
-    align-items: center;
     flex-direction: column;
-    flex: 1;
+    flex: 1 1 350px;
+    min-width: 350px;
+    max-width: 400px;
     margin: 10px;
     padding: 20px;
     border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: royalblue;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-
-.swimming-pool-form, .swimmer-form {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-.swimming-pool-container, .input-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-}
-
-.swimming-pool-input {
-    margin: 10px;
-    padding: 10px;
-    border-radius: 20px;
-    width: 20vw;
-}
-
-.swimmer-input {
+.swimming-pool-form,
+.swimmer-form,
+.document-upload-form {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    margin: 10px;
-    padding-left: 10px;
-    padding-top: 6px;
-    border-radius: 20px;
-    overflow-y: scroll;
-    width: 20vw;
-    height: 30vh;
+    width: 100%;
+}
+
+.swimming-pool-container,
+.input-container,
+.upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.swimming-pool-input,
+.swimmer-input,
+.upload-label {
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 8px;
+    width: 100%;
+    border: 1px solid #ccc;
+    font-family: inherit;
+    font-size: 1rem;
     resize: none;
 }
 
-.swimming-pool-button, .submit-button {
-    width: 150px;
-    height: 40px;
-    margin: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    cursor: pointer;
+.swimmer-input {
+    height: 150px;
 }
 
-.swimmer-content {
+.upload-label {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    cursor: pointer;
+    text-align: center;
+    min-height: 60px;
 }
 
-.swimmer-history {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.swimmer-history li {
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    background-color: lightblue;
-    margin: 10px;
+.swimming-pool-button,
+.submit-button,
+.upload-button,
+.delete-button,
+.delete-list-button,
+.delete-swimmer-chat {
+    width: 100%;
+    max-width: 200px;
+    height: 40px;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background-color: #ff6b6b;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
+.swimming-pool-button:hover,
+.submit-button:hover,
+.upload-button:hover,
+.delete-button:hover,
+.delete-list-button:hover,
+.delete-swimmer-chat:hover {
+    background-color: #ff5252;
+}
+
+/* Updated Swimmer Content to match Chat style */
+.swimmer-content {
+    width: 100%;
+    height: 200px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background-color: #e6f7ff;
+    margin-bottom: 15px;
+    font-family: inherit;
+    resize: none;
+    overflow-y: auto;
+}
+
+/* Removed the list styling to match textarea appearance */
+.swimmer-history {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    background-color: transparent;
+    border: none;
+    color: #333;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* History items as plain text with separators */
+.swimmer-history li {
+    padding: 8px 0;
+    border-bottom: 1px solid #b3e0ff;
+    margin: 0;
+    background-color: transparent;
+    border-radius: 0;
+    transform: none;
+}
+
+.swimmer-history li:last-child {
+    border-bottom: none;
+}
+
 .swimmer-history li:hover {
-    background-color: royalblue;
+    background-color: transparent;
+    transform: none;
 }
 
 .buttons {
     display: flex;
-    flex-direction: row;
-}
-
-.delete-button, .delete-list-button, .delete-swimmer-chat {
-    width: 150px;
-    height: 40px;
-    margin: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    cursor: pointer;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
 }
 
 .swimmer-chat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 10px;
-    padding-left: 10px;
-    padding-top: 6px;
-    border-radius: 20px;
-    border: 1px solid black;
-    background-color: lightblue;
-    overflow-y: scroll;
-    width: 25vw;
-    height: 30vh;
+    width: 100%;
+    height: 200px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background-color: #e6f7ff;
+    margin-bottom: 15px;
+    font-family: inherit;
     resize: none;
-
+    overflow-y: auto;
 }
 
-.swimmer-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 10px;
-    padding-left: 10px;
-    padding-top: 6px;
-    border-radius: 20px;
-    border: 1px solid black;
-    background-color: white;
-    overflow-y: scroll;
-    width: 25vw;
-    height: 30vh;
-    resize: none;
+.example-questions {
+    margin-top: 15px;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.example-questions p {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.example-questions li {
+    margin-bottom: 5px;
+    list-style-position: inside;
+}
+
+.loading-spinner,
+.chat-loading,
+.upload-loading {
+    color: white;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    header {
+        font-size: 2rem;
+        height: 25vh;
+    }
+
+    .container {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 100%;
+        min-width: auto;
+    }
 }

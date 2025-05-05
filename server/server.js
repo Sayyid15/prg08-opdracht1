@@ -4,9 +4,16 @@ import cors from "cors";
 import fetch from "node-fetch";
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { SystemMessage, HumanMessage } from "@langchain/core/messages";
+import multer from "multer";
+import { PDFLoader } from "langchain/document_loaders/fs/pdf";
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+import fs from "fs/promises";
 
 const app = express();
 const port = 3000;
+
+// Configure file upload
+const upload = multer({ dest: "uploads/" });
 
 // Middleware
 app.use(express.json());
@@ -22,15 +29,20 @@ const model = new AzureChatOpenAI({
 });
 
 const embedding = new AzureOpenAIEmbeddings({
-    temperature:0,
+    temperature: 0,
     azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_API_EMBEDDINGS_DEPLOYMENT_NAME
 });
 
 // Load the vectorstore
 let vectorStore;
 async function loadVectorStore() {
-    vectorStore = await FaissStore.load("swimmerStoryDb", embedding);
-    console.log("Vector store loaded!");
+    try {
+        vectorStore = await FaissStore.load("swimmerStoryDb", embedding);
+        console.log("Vector store loaded!");
+    } catch (error) {
+        console.log("No existing vector store found, creating new one");
+        vectorStore = await FaissStore.fromDocuments([], embedding);
+    }
 }
 await loadVectorStore();
 
@@ -60,11 +72,74 @@ async function getWeather(poolName) {
     }
 }
 
+// Process uploaded document
+async function processDocument(filePath) {
+    try {
+        const loader = new PDFLoader(filePath);
+        const docs = await loader.load();
+
+        const splitter = new RecursiveCharacterTextSplitter({
+            chunkSize: 1000,
+            chunkOverlap: 200,
+        });
+
+        const splitDocs = await splitter.splitDocuments(docs);
+        await vectorStore.addDocuments(splitDocs);
+
+        // Save the updated vector store
+        await vectorStore.save("swimmerStoryDb");
+
+        return "Document processed and added to knowledge base!";
+    } finally {
+        // Clean up the uploaded file
+        await fs.unlink(filePath).catch(console.error);
+    }
+}
+
 // Routes
 app.get("/", (req, res) => {
     res.send("Welcome to the Swimmer Training API!");
 });
 
+// Document upload endpoint
+app.post("/upload", upload.single("document"), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        // Check if the uploaded file is a PDF
+        if (!req.file.mimetype.includes('pdf')) {
+            await fs.unlink(req.file.path).catch(console.error);
+            return res.status(400).json({ error: "Only PDF files are allowed" });
+        }
+
+        // Verify file was actually written to disk
+        try {
+            await fs.access(req.file.path);
+        } catch (err) {
+            return res.status(500).json({ error: "File upload failed - file not saved" });
+        }
+
+        const result = await processDocument(req.file.path);
+        res.json({
+            message: result,
+            filename: req.file.originalname
+        });
+    } catch (error) {
+        console.error("Error processing document:", error);
+
+        // Clean up file if something went wrong
+        if (req.file?.path) {
+            await fs.unlink(req.file.path).catch(console.error);
+        }
+
+        res.status(500).json({
+            error: "Error processing document",
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
 // Set location and weather
 app.post("/location", async (req, res) => {
     const { pool } = req.body;
@@ -81,41 +156,53 @@ app.post("/location", async (req, res) => {
     }
 });
 
-// Generate swimmer summary
-async function swimmerSummary(swimmerTraining) {
+// Generate swimmer summary with RAG
+async function swimmerSummary(swimmerTraining, chatHistory) {
     if (!swimmerTraining) throw new Error('Swimmer entry is required');
 
+    // Search for relevant documents
     const relevantDocs = await vectorStore.similaritySearch(swimmerTraining, 3);
     const context = relevantDocs.map(doc => doc.pageContent).join("\n\n");
+
+    // Prepare conversation history
+    const history = chatHistory ? `Previous conversation:\n${chatHistory}\n\n` : '';
 
     const messages = [
         new SystemMessage(
             `You are a swimming trainer assistant. Summarize swimmer performances warmly and professionally.\n
 Today's date: ${date}.\n
 Location: ${poolName}.\n
-Use this past context if relevant:\n${context}`
+${currentWeather ? `Weather: ${currentWeather}\n` : ''}
+Use this knowledge base context if relevant:\n${context}\n
+${history}`
         ),
-        new HumanMessage(`Summarize the following swimmer performance:\n${swimmerTraining}`)
+        new HumanMessage(`Analyze and respond to:\n${swimmerTraining}`)
     ];
 
     const response = await model.invoke(messages);
-    return response.content;
+    return {
+        response: response.content,
+        sources: relevantDocs.map(doc => ({
+            pageContent: doc.pageContent,
+            metadata: doc.metadata
+        }))
+    };
 }
 
-// Chat endpoint
+// Chat endpoint with RAG
 app.post("/chat", async (req, res) => {
     try {
-        const { query: swimmerTraining } = req.body;
+        const { query: swimmerTraining, context } = req.body;
         if (!swimmerTraining) {
             return res.status(400).json({ error: 'Swimmer entry is required' });
         }
 
-        const response = await swimmerSummary(swimmerTraining);
+        const { response, sources } = await swimmerSummary(swimmerTraining, context);
 
         swimmerTrainings.push(swimmerTraining);
-        if (swimmerTrainings.length > 10) swimmerTrainings.shift(); // Keep last 10
+        if (swimmerTrainings.length > 10) swimmerTrainings.shift();
 
-        res.json({ response });
+        res.json({ response, sources });
     } catch (error) {
         console.error("Error in chat:", error);
         res.status(500).json({ error: "Error generating swimmer summary" });
